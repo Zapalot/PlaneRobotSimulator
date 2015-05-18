@@ -13,7 +13,9 @@ class SimulatedRobot {
   public  float vAngle;  // for continous movement (like with a gear motor)
 
   // for continous movement (like with a gear motor)
-  public  void simulateStep() {
+  public  void simulateStep(float time) {
+    turn(vAngle*time);// poor poor euler integration...
+    goForward(vForward*time);
   };
 
   // turn the robot without using speeds. (like with a stepper motor)
@@ -45,15 +47,32 @@ class SimulatedRobot {
     float windowY=height-pose.pos.y; //mirror y axis to mikick a conventional coordinate system
   }
 }
-SimulatedRobot myRobot= new SimulatedRobot();
+
+SimulatedRobot stepRobot= new SimulatedRobot();  // a robot moved on discrete steps
+SimulatedRobot speedRobot= new SimulatedRobot(); // a robot moving at a certain speed
 void setup() {
-  myRobot.pose.pos.x=20;
-  myRobot.pose.pos.y=20;
+  stepRobot.pose.pos.x=100;
+  stepRobot.pose.pos.y=200;
+  
+  // this robot will be moved by using the "simulateStep" function
+  speedRobot.pose.pos.x=200;
+  speedRobot.pose.pos.y=200;
+  speedRobot.vAngle=0.01; // radians/second
+  speedRobot.vForward=1; // pixels/second
   size(500, 500);
+  frameRate(500);
 }
 
 void draw() {
   background (255, 255, 255);
-  myRobot.draw();
+  // how to use a "step robot"
+  stepRobot.goForward(1);
+  stepRobot.turn(0.01);
+  stepRobot.draw();
+  
+  
+  // alternative approach: continous movement+integration:
+  speedRobot.simulateStep(1); // simulate a 1 second step
+  speedRobot.draw();
 }
 
